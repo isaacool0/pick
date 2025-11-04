@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Random Generators</title>
+  <style>
+    body {
+      background: #111111;
+      color: #ffffff;
+      margin: 0;
+      font-family: sans-serif;
+      text-align: center;
+    }
+    #main {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 1em;
+      text-align: center;
+      max-width: 800px;
+      margin: 0 auto;
+      background: #222222;
+      line-height: 200%;
+      border: 2px solid #442222;
+      border-radius: 4px;
+      box-shadow: 0 0 16px #442222;
+    }
+    p {
+      margin: 1em auto;
+      padding: 0 1em;
+      max-width: 700px;
+    }
+    a {
+      color: #fff;
+      background: #ff4444;
+      padding: 5px;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>Generators</h1>
+  <div id="main">
+  <% categories.forEach(category => { %>
+    <div><a href="/<%- category.name %>"><%- category.name %></a></div>
+  <% }); %>
+  </div>
+</body>
+</html>
+

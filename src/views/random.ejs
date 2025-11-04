@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title><%= category.name %></title>
+  <meta name="description" content="<%= item.content || `Random ${category.name} generator` %>">
+  <meta property="og:description" content="<%= item.content || `Random ${category.name} generator` %>">
+  <script>
+    let slug = '<%= item.slug %>'
+    async function random() {
+      let res = await fetch('/<%= category.name %>?action=random')
+      let data = await res.json()
+      if (data.error) {
+        document.getElementById('content').innerText = 'error'
+        document.getElementById('permalink').href = '#'
+      } else {
+        slug = data.slug
+        document.getElementById('content').innerText = data.content
+        document.getElementById('permalink').href = `<%= category.name %>/${slug}`
+      }
+    }
+    async function vote(value) {
+      let msg = document.getElementById('vote');
+      let type = value === 1 ? 'up' : 'down';
+      
+      await fetch(`/<%= category.name %>/${slug}?action=vote`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ vote: value })
+      })
+      .then(r => r.json())
+      .then(result => {
+        switch (result) {
+          case 1:
+            msg.style.color = '#0F0';
+            msg.textContent = `${type}voted`;
+            break;
+          case 0:
+            msg.style.color = '#F00';
+            msg.textContent = `removed ${type}vote`;
+            break;
+        }
+      })
+      .catch(error => {
+        msg.style.color = '#F00';
+        msg.textContent = `failed ${type}vote`; 
+      });
+    };
+  </script>
+  <style>
+    body {
+      background: #111111;
+      color: #ffffff;
+      margin: 0;
+      font-family: sans-serif;
+      text-align: center;
+    }
+    #main {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 1em;
+      text-align: center;
+      max-width: 800px;
+      margin: 0 auto;
+      background: #222222;
+      line-height: 200%;
+      border: 2px solid #442222;
+      border-radius: 4px;
+      box-shadow: 0 0 16px #442222;
+    }
+    p {
+      margin: 1em auto;
+      padding: 0 1em;
+      max-width: 700px;
+    }
+    button {
+      background: #ff4444;
+      color: #ffffff;
+      border: none;
+      padding: 0.5em 1em;
+      font-size: 1em;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #ff2222;
+    }
+    button:active {
+      background: #ff0000;
+    }
+    a {
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+  <h1><a href="/">Generators</a> / <a href="/<%= category.name %>"><%= category.name %></a></h1>
+  <div id="main">
+  <%- button %>
+  <br>
+  <div id="content">
+    <% if (item.content) { %>
+      <%= item.content %>
+    <% } %>
+    <% if (!item.content) { %>
+      <script>random()</script>
+    <% } %>
+  </div>
+  <br>
+  <div>
+    <button onclick="vote(1)">▲</button>
+    <button onclick="vote(0)">▼</button>
+    <br>
+    <span id="vote"></span>
+  </div>
+  <br>
+  <span>
+  <a id="permalink" href="/<%= category.name %>/<%= item.slug %>">link</a>
+  <a href="/<%= category.name %>?action=new">new</a>
+  </span>
+</div>
+</body>
+</html>
+
