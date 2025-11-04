@@ -20,18 +20,15 @@ CREATE TABLE public.items (
     id TEXT DEFAULT b64url(encode(public.gen_random_bytes(8), 'base64')) NOT NULL UNIQUE,
     category TEXT NOT NULL,
     content TEXT NOT NULL,
-    slug TEXT NOT NULL,
     active BOOL DEFAULT true,
     created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
-    UNIQUE (category, slug),
     UNIQUE (category, content),
     CONSTRAINT items_category_fkey FOREIGN KEY (category) REFERENCES public.categories(id) ON DELETE CASCADE
 );
 
 CREATE INDEX items_id_idx ON public.items(id);
 CREATE INDEX items_category_idx ON public.items(category);
-CREATE INDEX items_slug_idx ON public.items(slug);
 
 CREATE TABLE public.votes (
     item TEXT NOT NULL,

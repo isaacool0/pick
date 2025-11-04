@@ -16,7 +16,7 @@ let getCategory = async (name) => {
 
 let getItems = async (category, ip) => {
   let result = await db.query(`
-    SELECT items.id, items.content, items.slug,
+    SELECT items.id, items.content,
       SUM(CASE WHEN votes.vote THEN 1 ELSE 0 END) AS up,
       SUM(CASE WHEN NOT votes.vote THEN 1 ELSE 0 END) AS down,
       (SELECT vote FROM votes WHERE votes.item = items.id AND votes.ip = $2) AS vote
@@ -28,33 +28,33 @@ let getItems = async (category, ip) => {
   return result.rows
 }
 
-let getItem = async (category, slug, ip) => {
+let getItem = async (id, ip) => {
   let result = await db.query(`
-    SELECT items.id, items.content, items.slug, items.active,
+    SELECT items.id, items.content, items.active, items.category,
       SUM(CASE WHEN votes.vote THEN 1 ELSE 0 END) AS up,
       SUM(CASE WHEN NOT votes.vote THEN 1 ELSE 0 END) AS down,
-      (SELECT vote FROM votes WHERE votes.item = items.id AND votes.ip = $3) AS vote
+      (SELECT vote FROM votes WHERE votes.item = items.id AND votes.ip = $2) AS vote
     FROM items
     LEFT JOIN votes ON items.id = votes.item
-    WHERE items.category = $1 AND items.slug = $2 AND items.active = true
-    GROUP BY items.id
-  `, [category, slug, ip])
+    WHERE items.id = $1 AND items.active = true
+    GROUP BY items.id, items.category
+  `, [id, ip])
   return result.rows[0]
 }
 
-let insertItem = async (category, item, slug) => {
+let insertItem = async (category, content) => {
   await db.query(`
     INSERT INTO categories (name)
     VALUES ($1)
     ON CONFLICT (name) DO NOTHING
   `, [category])
   let result = await db.query(`
-    INSERT INTO items (category, content, slug)
-    SELECT id, $2, $3
+    INSERT INTO items (category, content)
+    SELECT id, $2
     FROM categories
     WHERE name = $1
-    RETURNING slug
-  `, [category, item, slug])
+    RETURNING id
+  `, [category, content])
   return result.rows[0]
 }
 
