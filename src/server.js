@@ -29,7 +29,7 @@ app.get('/', async (req, res) => {
 
 app.get('/:generator{/:item}', async (req, res) => {
   let generator = slugify(req.params.generator)
-  let item = req.params.item
+  let itemID = req.params.item
   let action = req.query.action
   let ip = req.ip
 
@@ -37,7 +37,7 @@ app.get('/:generator{/:item}', async (req, res) => {
   if (category?.active === false) return res.status(410).send('deleted')
 
   if (action === 'new') {
-    if (item) return res.redirect(302, `/${generator}?action=new`)
+    if (itemID) return res.redirect(302, `/${generator}?action=new`)
     return res.render('new', {
       title: `Add Item to ${generator}`,
       category: { name: generator }
@@ -55,8 +55,8 @@ app.get('/:generator{/:item}', async (req, res) => {
     return res.json(random)
   }
 
-  if (item) {
-    let item = await getItem(item, ip)
+  if (itemID) {
+    let item = await getItem(itemID, ip)
     if (item.category !== category.id) return res.redirect(302, `/${(await getCategory(item.category)).name}/${item.id}`)
     if (!item) return res.status(404).send('<h1>404: Not Found</h1>')
     if (item?.active === false) return res.status(410).send('deleted')
@@ -70,7 +70,7 @@ app.get('/:generator{/:item}', async (req, res) => {
 
   return res.render('random', {
     category: { name: generator },
-    item: { content: '', item: '#' },
+    item: { content: '', itemID: '#' },
     button: `<button onclick="random()">Random</button>`
   })
 })
@@ -92,14 +92,14 @@ app.post('/:generator', async (req, res) => {
 
 app.post('/:generator/:item', async (req, res) => {
   let generator = slugify(req.params.generator)
-  let item = req.params.item
+  let itemID = req.params.item
   let action = req.query.action
   let ip = req.ip
   let category = await getCategory(generator)
   if (!category) return res.status(404).send('Category not found')
   if (category?.active === false) return res.status(410).send('deleted')
   if (action === 'vote') {
-    let item = await getItem(item, ip)
+    let item = await getItem(itemID, ip)
     if (!item) return res.status(404).end()
     return res.json(await vote(item.id, ip, req.body.vote === '1'))
   }
