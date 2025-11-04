@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Add New Item to <%- category.name %></title>
+  <style>
+  body {
+    background: #111111;
+    color: #ffffff;
+    margin: 0;
+    font-family: sans-serif;
+    text-align: center;
+  }
+  #main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1em;
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto;
+    background: #222222;
+    line-height: 200%;
+    border: 2px solid #442222;
+    border-radius: 4px;
+    box-shadow: 0 0 16px #442222;
+  }
+  p {
+    margin: 1em auto;
+    padding: 0 1em;
+    max-width: 700px;
+  }
+  button {
+    background: #ff4444;
+    color: #ffffff;
+    border: none;
+    padding: 0.5em 1em;
+    font-size: 1em;
+    cursor: pointer;
+  }
+  button:hover {
+    background: #ff2222;
+  }
+  button:active {
+    background: #ff0000;
+  }
+  a {
+    color: #fff;
+  }
+  textarea {
+    min-height: 30px;
+    min-width: 300px;
+    field-sizing: content;
+    resize: none;
+    background-color: #333333;
+    color: #ffffff;
+    border: 1px solid #555555;
+    border-radius: 4px;
+  }
+</style>
+</head>
+<body>
+  <h1><a href="/">Home</a> / <a href="/<%- category.name %>"><%- category.name %></a></h1>
+  <div id="main">
+  <p>new item</p>
+  <form method="POST" action="/<%- category.name %>?action=create">
+    <textarea name="content" placeholder="enter content..." required></textarea><br>
+    <button type="submit">Submit</button>
+  </form>
+  </div>
+</body>
+</html>
+
