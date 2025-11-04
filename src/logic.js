@@ -84,7 +84,10 @@ let delVote = async (item, ip) => {
 };
 
 let addView = async (itemId, ip) => {
-  await db.query('INSERT INTO views (item, ip) VALUES ($1, $2)', [itemId, ip])
+  await db.query(`
+    INSERT INTO views (item, ip) VALUES ($1, $2)
+    ON CONFLICT (item, ip, viewed_on) DO NOTHING
+  `, [itemId, ip])
 }
 
 let getCategories = async () => {

@@ -45,8 +45,8 @@ CREATE INDEX votes_ip_idx ON public.votes(ip);
 CREATE TABLE public.views (
     item TEXT NOT NULL,
     ip INET NOT NULL,
-    viewed_at TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (item, ip, viewed_at),
+    viewed_on DATE DEFAULT CURRENT_DATE,
+    PRIMARY KEY (item, ip, viewed_on),
     CONSTRAINT views_item_fkey FOREIGN KEY (item) REFERENCES public.items(id) ON DELETE CASCADE
 );
 
