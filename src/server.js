@@ -29,7 +29,7 @@ app.get('/', async (req, res) => {
 
 app.get('/:generator{/:item}', async (req, res) => {
   let generator = slugify(req.params.generator)
-  let slug = req.params.item
+  let item = req.params.item
   let action = req.query.action
   let ip = req.ip
 
@@ -37,7 +37,7 @@ app.get('/:generator{/:item}', async (req, res) => {
   if (category?.active === false) return res.status(410).send('deleted')
 
   if (action === 'new') {
-    if (slug) return res.redirect(302, `/${generator}?action=new`)
+    if (item) return res.redirect(302, `/${generator}?action=new`)
     return res.render('new', {
       title: `Add Item to ${generator}`,
       category: { name: generator }
@@ -55,8 +55,9 @@ app.get('/:generator{/:item}', async (req, res) => {
     return res.json(random)
   }
 
-  if (slug) {
-    let item = await getItem(category.id, slug, ip)
+  if (item) {
+    let item = await getItem(item, ip)
+    if (item.category !== category.id) return res.redirect(302, `/${(await getCategory(item.category)).name}/${item.id}`)
     if (!item) return res.status(404).send('<h1>404: Not Found</h1>')
     if (item?.active === false) return res.status(410).send('deleted')
     await addView(item.id, ip)
@@ -69,7 +70,7 @@ app.get('/:generator{/:item}', async (req, res) => {
 
   return res.render('random', {
     category: { name: generator },
-    item: { content: '', slug: '#' },
+    item: { content: '', item: '#' },
     button: `<button onclick="random()">Random</button>`
   })
 })
@@ -82,8 +83,8 @@ app.post('/:generator', async (req, res) => {
   if (action === 'create') {
     let content = req.body.content?.trim()
     if (!content) return res.status(400).send('Content required')
-    let result = await insertItem(generator, content, slugify(content))
-    return res.redirect(`/${generator}/${result.slug}`)
+    let result = await insertItem(generator, content)
+    return res.redirect(`/${generator}/${result.id}`)
   }
 
   res.status(400).send('Invalid action')
@@ -91,14 +92,14 @@ app.post('/:generator', async (req, res) => {
 
 app.post('/:generator/:item', async (req, res) => {
   let generator = slugify(req.params.generator)
-  let slug = req.params.item
+  let item = req.params.item
   let action = req.query.action
   let ip = req.ip
   let category = await getCategory(generator)
   if (!category) return res.status(404).send('Category not found')
   if (category?.active === false) return res.status(410).send('deleted')
   if (action === 'vote') {
-    let item = await getItem(category.id, slug, ip)
+    let item = await getItem(item, ip)
     if (!item) return res.status(404).end()
     return res.json(await vote(item.id, ip, req.body.vote === '1'))
   }
