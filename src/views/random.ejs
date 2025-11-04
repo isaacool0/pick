@@ -14,10 +14,12 @@
       if (data.error) {
         document.getElementById('content').innerText = 'error'
         document.getElementById('permalink').href = '#'
+        document.getElementById('search').href = `https://www.google.com/search?q=#`;
       } else {
         id = data.id
         document.getElementById('content').innerText = data.content
         document.getElementById('permalink').href = `<%= category.name %>/${id}`
+        document.getElementById('search').href = `https://www.google.com/search?q=${encodeURIComponent(data.content)}`;
       }
     }
     async function vote(value) {
@@ -116,6 +118,7 @@
   </div>
   <br>
   <span>
+  <a id="search" href="https://www.google.com/search?q=<%= encodeURIComponent(item.content) %>">search</a>
   <a id="permalink" href="/<%= category.name %>/<%= item.id %>">link</a>
   <a href="/<%= category.name %>?action=new">new</a>
   </span>
