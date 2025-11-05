@@ -6,12 +6,16 @@ const slugify = (text) =>
 const slugifyItem = (text) =>
   text.replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')
 
+let categories = new Map();
 let getCategory = async (name) => {
+  if (categories.has(name)) return categories.get(name);
   let result = await db.query(
     'SELECT id, name, active FROM categories WHERE name = $1',
     [name]
   )
-  return result.rows[0] || null
+  let category = result.rows[0] || null;
+  if (category) categories.set(name, category);
+  return category;
 }
 
 let getItems = async (category, ip) => {
@@ -90,7 +94,10 @@ let addView = async (itemId, ip) => {
   `, [itemId, ip])
 }
 
+let categoryList = null;
+let listExpire = 0;
 let getCategories = async () => {
+  if (categoryList && Date.now() < listExpire) return categoryList;
   let result = await db.query(`
     SELECT categories.name, COUNT(items.id) AS item_count
     FROM categories 
@@ -99,9 +106,10 @@ let getCategories = async () => {
     GROUP BY categories.name
     ORDER BY item_count DESC, categories.name
   `)
+  categoryList = result.rows;
+  listExpire = Date.now() + 300000; //5 minutes
   return result.rows
 }
-
 
 let randomItem = async (category, ip) => {
   let items = await getItems(category, ip)
