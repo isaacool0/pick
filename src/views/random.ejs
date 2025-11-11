@@ -13,6 +13,7 @@
       margin: 0;
       font-family: sans-serif;
       text-align: center;
+      font-size: 12pt;
     }
     #main {
       display: flex;
@@ -53,6 +54,15 @@
     input[type="range"] {
       accent-color: #ff4444;
     }
+    #rating {
+      cursor: pointer;
+      text-decoration: underline;
+    }
+    .note {
+      color: #888888;
+      font-size: 10pt;
+      line-height: 1em;
+    }
   </style>
 </head>
 <body>
@@ -68,22 +78,20 @@
       <script>window.onload=()=>random();</script>
     <% } %>
   </div>
-  <br>
   <div>
+    <span id='rating' onclick="toggle()"></span>
+    <br>
     <button onclick="vote(1)">▲</button>
     <button onclick="vote(0)">▼</button>
-    <br>
-    <span id='rating'></span>
-    <br>
     <span id="vote"></span>
-  </div>
-  <br>
-  <div class="min-max">
+  </div><br>
+  <div id="min-max" style="display:none;">
   <label for="min">min: <span id="min-value">30%</span></label>
   <input type="range" id="min" min="0" max="100" value="30" step="5" oninput="range('min')">
   <br>
   <label for="max">max: <span id="max-value">100%</span></label>
   <input type="range" id="max" min="0" max="100" value="100" step="5" oninput="range('max')">
+  <div class='note'><br>votes are for quality control<br>these sliders control what quality you will see</div><br>
 </div>
   <span>
   <a id="search" target="_blank" href="https://www.google.com/search?q=<%= encodeURIComponent(item.content) %>">search</a>
@@ -152,6 +160,10 @@ function range(a) {
       document.getElementById('min-value').innerText = `${max.value}%`;
     }
   }
+}
+function toggle() {
+  let mm = document.getElementById('min-max');
+  mm.style.display = mm.style.display === 'none' ? 'block' : 'none';
 }
 </script>
 </body>
