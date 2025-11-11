@@ -20,13 +20,12 @@ let getCategory = async (name) => {
 
 let getItems = async (category) => {
   let result = await db.query(`
-    SELECT
-      items.id,
-      items.content,
+    SELECT items.id, items.content,
       COUNT(CASE WHEN votes.vote THEN 1 END) AS up,
       COUNT(CASE WHEN NOT votes.vote THEN 1 END) AS down,
-      (100.0 * (COUNT(CASE WHEN votes.vote THEN 1 END) + 1)) / (COUNT(CASE WHEN votes.vote THEN 1 END) + 1 + COUNT(CASE WHEN NOT votes.vote THEN 1 END))
-      AS rating
+      (100.0 * (COUNT(CASE WHEN votes.vote THEN 1 END) + 1)) / 
+        (COUNT(CASE WHEN votes.vote THEN 1 END) + 1 + COUNT(CASE WHEN NOT votes.vote THEN 1 END))
+        AS rating
     FROM items
     LEFT JOIN votes ON items.id = votes.item
     WHERE items.category = $1 AND items.active = true
@@ -36,17 +35,19 @@ let getItems = async (category) => {
   return result.rows
 }
 
-let getItem = async (id, ip) => {
+let getItem = async (id) => {
   let result = await db.query(`
-    SELECT items.id, items.content, items.active, items.category,
-      SUM(CASE WHEN votes.vote THEN 1 ELSE 0 END) AS up,
-      SUM(CASE WHEN NOT votes.vote THEN 1 ELSE 0 END) AS down,
-      (SELECT vote FROM votes WHERE votes.item = items.id AND votes.ip = $2) AS vote
+    SELECT items.id, items.content, items.category,
+      COUNT(CASE WHEN votes.vote THEN 1 END) AS up,
+      COUNT(CASE WHEN NOT votes.vote THEN 1 END) AS down,
+      (100.0 * (COUNT(CASE WHEN votes.vote THEN 1 END) + 1)) /
+        (COUNT(CASE WHEN votes.vote THEN 1 END) + 1 + COUNT(CASE WHEN NOT votes.vote THEN 1 END))
+        AS rating
     FROM items
     LEFT JOIN votes ON items.id = votes.item
     WHERE items.id = $1 AND items.active = true
-    GROUP BY items.id, items.category
-  `, [id, ip])
+    GROUP BY items.id, items.content, items.category
+  `, [id])
   return result.rows[0]
 }
 
@@ -66,7 +67,8 @@ let insertItem = async (category, content) => {
   return result.rows[0]
 }
 
-let vote = async (item, ip, vote) => {
+let vote = async (item, ip, rating) => {
+  let vote = rating === 1 ? true : false;
   let result = await db.query(`SELECT vote FROM votes WHERE item = $1 AND ip = $2`, [item, ip]);
   if (result.rows.length === 0) {
     await addVote(item, ip, vote);
@@ -118,16 +120,15 @@ let getCategories = async () => {
 }
 
 let randomItem = async (category, ip, min, max) => {
-  let items = await getItems(category)
-  let filtered = items.filter(item => {
-    let rating = Number(item.rating);
-    return rating >= min && rating <= max;
-  });
-  let random = filtered.length > 0 ? filtered[Math.floor(Math.random() * filtered.length)] : null
-  if (!random) return null
-  //random.vote = await getVote(random.id, ip);
-  await addView(random.id, ip)
-  return random
+  let items = await getItems(category);
+  let filtered = items.filter(item => {
+    let rating = +item.rating;
+    return rating >= +min && rating <= +max;
+  });
+  let random = filtered.length > 0 ? filtered[Math.floor(Math.random() * filtered.length)] : null;
+  if (!random) return null;
+  await addView(random.id, ip);
+  return random;
 }
 
 module.exports = {
