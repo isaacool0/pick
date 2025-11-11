@@ -9,6 +9,7 @@ $$ LANGUAGE plpgsql;
 CREATE TABLE public.categories (
     id TEXT DEFAULT b64url(encode(public.gen_random_bytes(8), 'base64')) NOT NULL UNIQUE,
     name TEXT NOT NULL UNIQUE,
+    description TEXT, 
     active BOOL DEFAULT true,
     created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (id)
