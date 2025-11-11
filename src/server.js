@@ -32,6 +32,8 @@ app.get('/:generator{/:item}', async (req, res) => {
   let itemID = req.params.item
   let action = req.query.action
   let ip = req.ip
+  let min = req.query.min || 30;
+  let max = req.query.max || 100;
 
   let category = await getCategory(generator)
   if (category?.active === false) return res.status(410).send('deleted')
@@ -50,13 +52,13 @@ app.get('/:generator{/:item}', async (req, res) => {
 
   if (action === 'random') {
     if (!category) return res.status(404).json({ error: 'Category not found' })
-    let random = await randomItem(category.id, ip)
-    if (!random) return res.status(404).json({ error: 'No items found' })
+    let random = await randomItem(category.id, ip, min, max)
+    if (!random) return {id: '#', content: 'no items found (adjust min/max range?)', rating: ''}
     return res.json(random)
   }
 
   if (itemID) {
-    let item = await getItem(itemID, ip)
+    let item = await getItem(itemID)
     if (item.category !== category.id) return res.redirect(302, `/${(await getCategory(item.category)).name}/${item.id}`)
     if (!item) return res.status(404).send('<h1>404: Not Found</h1>')
     if (item?.active === false) return res.status(410).send('deleted')
@@ -99,9 +101,9 @@ app.post('/:generator/:item', async (req, res) => {
   if (!category) return res.status(404).send('Category not found')
   if (category?.active === false) return res.status(410).send('deleted')
   if (action === 'vote') {
-    let item = await getItem(itemID, ip)
+    let item = await getItem(itemID)
     if (!item) return res.status(404).end()
-    return res.json(await vote(item.id, ip, req.body.vote === '1'))
+    return res.json(await vote(item.id, ip, req.body.vote))
   }
   res.status(400).send('Invalid action')
 })

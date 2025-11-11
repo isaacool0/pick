@@ -73,6 +73,8 @@
     <button onclick="vote(1)">▲</button>
     <button onclick="vote(0)">▼</button>
     <br>
+    <span id='rating'></span>
+    <br>
     <span id="vote"></span>
   </div>
   <br>
@@ -106,6 +108,8 @@ async function random() {
     document.getElementById('permalink').href = `<%= category.name %>/${id}`
     document.getElementById('search').href = `https://www.google.com/search?q=${encodeURIComponent(data.content)}`;
     document.getElementById('vote').innerText = '';
+    document.getElementById('rating').innerText = `${parseFloat(Number(data.rating).toFixed(2))}%`;
+    document.getElementById('rating').style.color = `hsl(${+data.rating * 1.2}, 100%, 50%)`;
   }
 }
 async function vote(value) {
