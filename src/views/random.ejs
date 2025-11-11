@@ -6,51 +6,6 @@
   <title><%= category.name %></title>
   <meta name="description" content="<%= item.content || `Random ${category.name} generator` %>">
   <meta property="og:description" content="<%= item.content || `Random ${category.name} generator` %>">
-  <script>
-    let id = '<%= item.id %>';
-    async function random() {
-      let res = await fetch('/<%= category.name %>?action=random')
-      let data = await res.json()
-      if (data.error) {
-        document.getElementById('content').innerText = 'error'
-        document.getElementById('permalink').href = '#'
-        document.getElementById('search').href = `https://www.google.com/search?q=#`;
-      } else {
-        id = data.id
-        document.getElementById('content').innerText = data.content
-        document.getElementById('permalink').href = `<%= category.name %>/${id}`
-        document.getElementById('search').href = `https://www.google.com/search?q=${encodeURIComponent(data.content)}`;
-        document.getElementById('vote').innerText = '';
-      }
-    }
-    async function vote(value) {
-      let msg = document.getElementById('vote');
-      let type = value === 1 ? 'up' : 'down';
-      
-      await fetch(`/<%= category.name %>/${id}?action=vote`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ vote: value })
-      })
-      .then(r => r.json())
-      .then(result => {
-        switch (result) {
-          case 1:
-            msg.style.color = '#0F0';
-            msg.textContent = `${type}voted`;
-            break;
-          case 0:
-            msg.style.color = '#F00';
-            msg.textContent = `removed ${type}vote`;
-            break;
-        }
-      })
-      .catch(error => {
-        msg.style.color = '#F00';
-        msg.textContent = `failed ${type}vote`; 
-      });
-    };
-  </script>
   <style>
     body {
       background: #111111;
@@ -95,6 +50,9 @@
     a {
       color: #fff;
     }
+    input[type="range"] {
+      accent-color: #ff4444;
+    }
   </style>
 </head>
 <body>
@@ -107,7 +65,7 @@
       <%= item.content %>
     <% } %>
     <% if (!item.content) { %>
-      <script>random()</script>
+      <script>window.onload=()=>random();</script>
     <% } %>
   </div>
   <br>
@@ -118,12 +76,80 @@
     <span id="vote"></span>
   </div>
   <br>
+  <div class="min-max">
+  <label for="min">min: <span id="min-value">30%</span></label>
+  <input type="range" id="min" min="0" max="100" value="30" step="5" oninput="range('min')">
+  <br>
+  <label for="max">max: <span id="max-value">100%</span></label>
+  <input type="range" id="max" min="0" max="100" value="100" step="5" oninput="range('max')">
+</div>
   <span>
   <a id="search" target="_blank" href="https://www.google.com/search?q=<%= encodeURIComponent(item.content) %>">search</a>
   <a id="permalink" href="/<%= category.name %>/<%= item.id %>">link</a>
   <a href="/<%= category.name %>?action=new">new</a>
   </span>
 </div>
+<script>
+let id = '<%= item.id %>';
+async function random() {
+  let min = document.getElementById('min').value;
+  let max = document.getElementById('max').value;
+  let res = await fetch(`/<%= category.name %>?action=random&min=${min}&max=${max}`)
+  let data = await res.json()
+  if (data.error) {
+    document.getElementById('content').innerText = 'error'
+    document.getElementById('permalink').href = '#'
+    document.getElementById('search').href = `https://www.google.com/search?q=#`;
+  } else {
+    id = data.id
+    document.getElementById('content').innerText = data.content
+    document.getElementById('permalink').href = `<%= category.name %>/${id}`
+    document.getElementById('search').href = `https://www.google.com/search?q=${encodeURIComponent(data.content)}`;
+    document.getElementById('vote').innerText = '';
+  }
+}
+async function vote(value) {
+  let msg = document.getElementById('vote');
+  let type = value === 1 ? 'up' : 'down';
+  
+  await fetch(`/<%= category.name %>/${id}?action=vote`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ vote: value })
+  })
+  .then(r => r.json())
+  .then(result => {
+    switch (result) {
+      case 1:
+        msg.style.color = '#0F0';
+        msg.textContent = `${type}voted`;
+        break;
+      case 0:
+        msg.style.color = '#F00';
+        msg.textContent = `removed ${type}vote`;
+        break;
+    }
+  })
+  .catch(error => {
+    msg.style.color = '#F00';
+    msg.textContent = `failed ${type}vote`; 
+  });
+};
+function range(a) {
+  let min = document.getElementById('min');
+  let max = document.getElementById('max');
+  document.getElementById(`${a}-value`).innerText = `${document.getElementById(a).value}%`;
+  if (+min.value > +max.value) {
+    if (a === 'min') {
+      max.value = min.value;
+      document.getElementById('max-value').innerText = `${min.value}%`;
+    } else if (a === 'max') {
+      min.value = max.value;
+      document.getElementById('min-value').innerText = `${max.value}%`;
+    }
+  }
+}
+</script>
 </body>
 </html>
 
