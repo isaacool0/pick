@@ -18,17 +18,21 @@ let getCategory = async (name) => {
   return category;
 }
 
-let getItems = async (category, ip) => {
+let getItems = async (category) => {
   let result = await db.query(`
-    SELECT items.id, items.content,
-      SUM(CASE WHEN votes.vote THEN 1 ELSE 0 END) AS up,
-      SUM(CASE WHEN NOT votes.vote THEN 1 ELSE 0 END) AS down,
-      (SELECT vote FROM votes WHERE votes.item = items.id AND votes.ip = $2) AS vote
+    SELECT
+      items.id,
+      items.content,
+      COUNT(CASE WHEN votes.vote THEN 1 END) AS up,
+      COUNT(CASE WHEN NOT votes.vote THEN 1 END) AS down,
+      (100.0 * (COUNT(CASE WHEN votes.vote THEN 1 END) + 1)) / (COUNT(CASE WHEN votes.vote THEN 1 END) + 1 + COUNT(CASE WHEN NOT votes.vote THEN 1 END))
+      AS rating
     FROM items
     LEFT JOIN votes ON items.id = votes.item
     WHERE items.category = $1 AND items.active = true
-    GROUP BY items.id
-  `, [category, ip])
+    GROUP BY items.id, items.content
+    ORDER BY rating DESC
+  `, [category])
   return result.rows
 }
 
@@ -87,6 +91,8 @@ let delVote = async (item, ip) => {
   return await db.query(query, [item, ip]);
 };
 
+//getVote
+
 let addView = async (itemId, ip) => {
   await db.query(`
     INSERT INTO views (item, ip) VALUES ($1, $2)
@@ -111,10 +117,15 @@ let getCategories = async () => {
   return result.rows
 }
 
-let randomItem = async (category, ip) => {
-  let items = await getItems(category, ip)
-  let random = items.length > 0 ? items[Math.floor(Math.random() * items.length)] : null
+let randomItem = async (category, ip, min, max) => {
+  let items = await getItems(category)
+  let filtered = items.filter(item => {
+    let rating = Number(item.rating);
+    return rating >= min && rating <= max;
+  });
+  let random = filtered.length > 0 ? filtered[Math.floor(Math.random() * filtered.length)] : null
   if (!random) return null
+  //random.vote = await getVote(random.id, ip);
   await addView(random.id, ip)
   return random
 }
