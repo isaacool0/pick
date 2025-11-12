@@ -37,7 +37,7 @@ let getItems = async (category) => {
 
 let getItem = async (id) => {
   let result = await db.query(`
-    SELECT items.id, items.content, items.category,
+    SELECT items.id, items.content, items.category, items.active,
       COUNT(CASE WHEN votes.vote THEN 1 END) AS up,
       COUNT(CASE WHEN NOT votes.vote THEN 1 END) AS down,
       (100.0 * (COUNT(CASE WHEN votes.vote THEN 1 END) + 1)) /
