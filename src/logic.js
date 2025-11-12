@@ -141,7 +141,6 @@ let percent = async (n, def) => {
 
 let getParams = async (query) => {
   let params = '';
-  
   if (query.min) params += `&min=${await percent(query.min, 30)}`;
   if (query.max) params += `&max=${await percent(query.max, 100)}`;
   return params;

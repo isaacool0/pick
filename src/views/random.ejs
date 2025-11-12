@@ -94,7 +94,7 @@
   <br>
   <label for="max">max: <span id="max-value"><%= max %>%</span></label>
   <input type="range" id="max" min="0" max="100" value="<%= max %>" step="5" oninput="range('max')">
-  <div class='note'><br>votes are for quality control<br>this is the range of ratings you will see</div><br>
+  <div class='note'><br>votes are for quality control<br>vote on quality, not opinion<br>min/max sets rating range</div><br>
 </div>
   <span>
   <a id="search" target="_blank" href="https://www.google.com/search?q=<%= encodeURIComponent(item.content) %>">search</a>
