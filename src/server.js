@@ -29,7 +29,7 @@ app.get('/', async (req, res) => {
   let categories = await getCategories()
   let min = await percent(req.query.min, 30)
   let max = await percent(req.query.max, 100)
-  let urlParams = await getParams(req.query, min, max);
+  let urlParams = await getParams(req.query);
   res.render('home', { categories, urlParams })
 })
 
