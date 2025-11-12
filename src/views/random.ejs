@@ -89,11 +89,11 @@
     <span id="vote"></span>
   </div><br>
   <div id="min-max" style="display:none;">
-  <label for="min">min: <span id="min-value"><%= params.min || 30 %>%</span></label>
-  <input type="range" id="min" min="0" max="100" value="<%= params.min || 30 %>" step="5" oninput="range('min')">
+  <label for="min">min: <span id="min-value"><%= min %>%</span></label>
+  <input type="range" id="min" min="0" max="100" value="<%= min %>" step="5" oninput="range('min')">
   <br>
-  <label for="max">max: <span id="max-value"><%= params.max || 100 %>%</span></label>
-  <input type="range" id="max" min="0" max="100" value="<%= params.max || 100 %>" step="5" oninput="range('max')">
+  <label for="max">max: <span id="max-value"><%= max %>%</span></label>
+  <input type="range" id="max" min="0" max="100" value="<%= max %>" step="5" oninput="range('max')">
   <div class='note'><br>votes are for quality control<br>this is the range of ratings you will see</div><br>
 </div>
   <span>

@@ -32,8 +32,8 @@ app.get('/:generator{/:item}', async (req, res) => {
   let itemID = req.params.item
   let action = req.query.action
   let ip = req.ip
-  let min = req.query.min || 30;
-  let max = req.query.max || 100;
+  let min = Math.min(100, Math.max(0, parseFloat(req.query.min) || 30));
+  let max = Math.min(100, Math.max(0, parseFloat(req.query.max) || 100));
 
   let category = await getCategory(generator)
   if (category?.active === false) return res.status(410).send('deleted')
@@ -67,7 +67,8 @@ app.get('/:generator{/:item}', async (req, res) => {
       category,
       item,
       button: `<a href="/${generator}"><button>Random</button></a>`,
-      params: req.query
+      min,
+      max
     })
   }
 
@@ -75,7 +76,8 @@ app.get('/:generator{/:item}', async (req, res) => {
     category: { name: generator },
     item: { content: '', itemID: '#', rating: ''},
     button: `<button onclick="random()">Random</button>`,
-    params: req.query
+    min,
+    max
   })
 })
 
