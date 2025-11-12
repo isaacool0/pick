@@ -66,14 +66,16 @@ app.get('/:generator{/:item}', async (req, res) => {
     return res.render('random', {
       category,
       item,
-      button: `<a href="/${generator}"><button>Random</button></a>`
+      button: `<a href="/${generator}"><button>Random</button></a>`,
+      params: req.query
     })
   }
 
   return res.render('random', {
     category: { name: generator },
     item: { content: '', itemID: '#', rating: ''},
-    button: `<button onclick="random()">Random</button>`
+    button: `<button onclick="random()">Random</button>`,
+    params: req.query
   })
 })
 
