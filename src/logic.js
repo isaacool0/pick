@@ -119,13 +119,17 @@ let getCategories = async () => {
   return result.rows
 }
 
+let getFiltered = async (category, min, max) => {
+  let items = await getItems(category);
+  return items.filter(item => {
+    let rating = parseFloat(item.rating);
+    return rating >= min && rating <= max;
+  });
+};
+
 let randomItem = async (category, ip, min, max) => {
-  let items = await getItems(category);
-  let filtered = items.filter(item => {
-    let rating = +item.rating;
-    return rating >= +min && rating <= +max;
-  });
-  let random = filtered.length > 0 ? filtered[Math.floor(Math.random() * filtered.length)] : null;
+  let items = await getFiltered(category, min, max);
+  let random = items.length > 0 ? items[Math.floor(Math.random() * items.length)] : null;
   if (!random) return null;
   await addView(random.id, ip);
   return random;
@@ -140,6 +144,7 @@ module.exports = {
   vote,
   addView,
   getCategories,
+  getFiltered,
   randomItem
 }
 
