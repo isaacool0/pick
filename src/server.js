@@ -8,6 +8,7 @@ const {
   vote,
   addView,
   getCategories,
+  getFiltered,
   randomItem
 } = require('./logic')
 
@@ -34,6 +35,9 @@ app.get('/:generator{/:item}', async (req, res) => {
   let ip = req.ip
   let min = Math.min(100, Math.max(0, parseFloat(req.query.min) || 30));
   let max = Math.min(100, Math.max(0, parseFloat(req.query.max) || 100));
+  let urlParams = '';
+  if (req.query.min) urlParams += `&min=${min}`;
+  if (req.query.max) urlParams += `&max=${max}`;
 
   let category = await getCategory(generator)
   if (category?.active === false) return res.status(410).send('deleted')
@@ -50,25 +54,33 @@ app.get('/:generator{/:item}', async (req, res) => {
     return res.redirect(302, `/${generator}?action=new`)
   }
 
+  if (action === 'list') {
+    if (!category) return res.status(404).json({ error: 'Category not found' })
+    let items = await getFiltered(category.id, min, max);
+    if (!items.length) return res.status(200).type('text/plain').send('no items found (adjust min/max range?)');
+    return res.type('text/plain').send(items.map(i => i.content).join('\n'));
+  }
+
   if (action === 'random') {
     if (!category) return res.status(404).json({ error: 'Category not found' })
     let random = await randomItem(category.id, ip, min, max)
-    if (!random) return {id: '#', content: 'no items found (adjust min/max range?)', rating: ''}
+    if (!random) return res.json({id: '#', content: 'no items found (adjust min/max range?)', rating: ''});
     return res.json(random)
   }
 
   if (itemID) {
     let item = await getItem(itemID)
-    if (item.category !== category.id) return res.redirect(302, `/${(await getCategory(item.category)).name}/${item.id}`)
     if (!item) return res.status(404).send('<h1>404: Not Found</h1>')
+    if (item.category !== category.id) return res.redirect(302, `/${(await getCategory(item.category)).name}/${item.id}`)
     if (item?.active === false) return res.status(410).send('deleted')
     await addView(item.id, ip)
     return res.render('random', {
       category,
       item,
-      button: `<a href="/${generator}"><button>Random</button></a>`,
+      button: `<a href="/${generator}${urlParams ? urlParams.replace(/^&/, '?') : ''}"><button>Random</button></a>`,
       min,
-      max
+      max,
+      urlParams
     })
   }
 
@@ -77,7 +89,8 @@ app.get('/:generator{/:item}', async (req, res) => {
     item: { content: '', itemID: '#', rating: ''},
     button: `<button onclick="random()">Random</button>`,
     min,
-    max
+    max,
+    urlParams
   })
 })
 
