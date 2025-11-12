@@ -94,7 +94,7 @@
   <br>
   <label for="max">max: <span id="max-value"><%= max %>%</span></label>
   <input type="range" id="max" min="0" max="100" value="<%= max %>" step="5" oninput="range('max')">
-  <div class='note'><br>items with a rating below min or above max are excluded<br>votes are for quality control<br>please vote on quality, not opinion</div><br>
+  <div class='note'><br>items with a rating below min or above max are excluded<br>votes should be on how well an item fits in rather than taste</div><br>
 </div>
   <span>
   <a id="search" target="_blank" href="https://www.google.com/search?q=<%= encodeURIComponent(item.content) %>">search</a>
