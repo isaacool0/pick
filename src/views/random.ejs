@@ -79,10 +79,13 @@
     <% } %>
   </div>
   <div>
-    <span id='rating' onclick="toggle()"></span>
+    <span id='rating' onclick="toggle()" style="color:hsl(<%= item.rating * 1.2 %>,100%,50%)">
+      <%= parseFloat(Number(item.rating).toFixed(2)) %>%
+    </span>
     <br>
     <button onclick="vote(1)">▲</button>
     <button onclick="vote(0)">▼</button>
+    <br>
     <span id="vote"></span>
   </div><br>
   <div id="min-max" style="display:none;">
@@ -91,7 +94,7 @@
   <br>
   <label for="max">max: <span id="max-value">100%</span></label>
   <input type="range" id="max" min="0" max="100" value="100" step="5" oninput="range('max')">
-  <div class='note'><br>votes are for quality control<br>these sliders control what quality you will see</div><br>
+  <div class='note'><br>votes are for quality control<br>this is the range of ratings you will see</div><br>
 </div>
   <span>
   <a id="search" target="_blank" href="https://www.google.com/search?q=<%= encodeURIComponent(item.content) %>">search</a>
