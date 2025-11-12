@@ -72,7 +72,7 @@ app.get('/:generator{/:item}', async (req, res) => {
 
   return res.render('random', {
     category: { name: generator },
-    item: { content: '', itemID: '#' },
+    item: { content: '', itemID: '#', rating: ''},
     button: `<button onclick="random()">Random</button>`
   })
 })
