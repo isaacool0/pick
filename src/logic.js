@@ -135,6 +135,19 @@ let randomItem = async (category, ip, min, max) => {
   return random;
 }
 
+let percent = async (n, def) => {
+  return Math.min(100, Math.max(0, parseFloat(n) || def));
+}
+
+let getParams = async (query) => {
+  let params = '';
+  
+  if (query.min) params += `&min=${await percent(query.min, 30)}`;
+  if (query.max) params += `&max=${await percent(query.max, 100)}`;
+  return params;
+}
+
+
 module.exports = {
   slugify,
   getCategory,
@@ -145,6 +158,8 @@ module.exports = {
   addView,
   getCategories,
   getFiltered,
-  randomItem
+  randomItem,
+  getParams,
+  percent
 }
 

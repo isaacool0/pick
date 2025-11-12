@@ -45,7 +45,7 @@
   <h1>Generators</h1>
   <div id="main">
   <% categories.forEach(category => { %>
-    <div><a href="/<%- category.name %>"><%- category.name %></a></div>
+    <div><a href="/<%- category.name %><%= urlParams.replace(/^&/, '?') %>"><%- category.name %></a></div>
   <% }); %>
   </div>
 </body>

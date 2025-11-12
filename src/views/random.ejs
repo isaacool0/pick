@@ -66,7 +66,7 @@
   </style>
 </head>
 <body>
-  <h1><a href="/">Generators</a> / <a href="/<%= category.name %>"><%= category.name %></a></h1>
+  <h1><a href="/<%= urlParams.replace(/^&/, '?') %>">Generators</a> / <a href="/<%= category.name %>"><%= category.name %></a></h1>
   <div id="main">
   <%- button %>
   <br>
@@ -117,7 +117,7 @@ async function random() {
   } else {
     id = data.id
     document.getElementById('content').innerText = data.content
-    document.getElementById('permalink').href = `<%= category.name %>/${id}`
+    document.getElementById('permalink').href = `/<%= category.name %>/${id}<%= urlParams.replace(/^&/, '?') %>`
     document.getElementById('search').href = `https://www.google.com/search?q=${encodeURIComponent(data.content)}`;
     document.getElementById('vote').innerText = '';
     document.getElementById('rating').innerText = `${parseFloat(Number(data.rating).toFixed(2))}%`;

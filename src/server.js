@@ -9,7 +9,9 @@ const {
   addView,
   getCategories,
   getFiltered,
-  randomItem
+  randomItem,
+  getParams,
+  percent
 } = require('./logic')
 
 const app = express()
@@ -25,7 +27,10 @@ app.use(express.json())
 
 app.get('/', async (req, res) => {
   let categories = await getCategories()
-  res.render('home', { categories })
+  let min = await percent(req.query.min, 30)
+  let max = await percent(req.query.max, 100)
+  let urlParams = await getParams(req.query, min, max);
+  res.render('home', { categories, urlParams })
 })
 
 app.get('/:generator{/:item}', async (req, res) => {
@@ -33,11 +38,9 @@ app.get('/:generator{/:item}', async (req, res) => {
   let itemID = req.params.item
   let action = req.query.action
   let ip = req.ip
-  let min = Math.min(100, Math.max(0, parseFloat(req.query.min) || 30));
-  let max = Math.min(100, Math.max(0, parseFloat(req.query.max) || 100));
-  let urlParams = '';
-  if (req.query.min) urlParams += `&min=${min}`;
-  if (req.query.max) urlParams += `&max=${max}`;
+  let min = await percent(req.query.min, 30)
+  let max = await percent(req.query.max, 100)
+  let urlParams = await getParams(req.query);
 
   let category = await getCategory(generator)
   if (category?.active === false) return res.status(410).send('deleted')
@@ -77,7 +80,7 @@ app.get('/:generator{/:item}', async (req, res) => {
     return res.render('random', {
       category,
       item,
-      button: `<a href="/${generator}${urlParams ? urlParams.replace(/^&/, '?') : ''}"><button>Random</button></a>`,
+      button: `<a href="/${generator}${urlParams.replace(/^&/, '?')}"><button>Random</button></a>`,
       min,
       max,
       urlParams
