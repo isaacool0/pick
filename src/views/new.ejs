@@ -58,7 +58,17 @@
     border: 1px solid #555555;
     border-radius: 4px;
   }
-</style>
+  @media (orientation: landscape) {
+    #main {
+      width: 50%;
+    }
+  }
+  @media (orientation: portrait) {
+      #main {
+        width: 75%;
+      }
+   }
+  </style>
 </head>
 <body>
   <h1><a href="/">Generators</a> / <a href="/<%- category.name %>"><%- category.name %></a></h1>

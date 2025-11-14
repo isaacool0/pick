@@ -7,62 +7,74 @@
   <meta name="description" content="<%= item.content || `Random ${category.name} generator` %>">
   <meta property="og:description" content="<%= item.content || `Random ${category.name} generator` %>">
   <style>
-    body {
-      background: #111111;
-      color: #ffffff;
-      margin: 0;
-      font-family: sans-serif;
-      text-align: center;
-      font-size: 12pt;
-    }
+  body {
+    background: #111111;
+    color: #ffffff;
+    margin: 0;
+    font-family: sans-serif;
+    text-align: center;
+    font-size: 12pt;
+  }
+  #main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1em;
+    text-align: center;
+    margin: 0 auto;
+    background: #222222;
+    line-height: 200%;
+    border: 2px solid #442222;
+    border-radius: 4px;
+    box-shadow: 0 0 16px #442222;
+  }
+  p {
+    margin: 1em auto;
+    padding: 0 1em;
+    max-width: 700px;
+  }
+  #content {
+    line-height: 100%;
+  }
+  button {
+    background: #ff4444;
+    color: #ffffff;
+    border: none;
+    padding: 0.5em 1em;
+    font-size: 1em;
+    cursor: pointer;
+  }
+  button:hover {
+    background: #ff2222;
+  }
+  button:active {
+    background: #ff0000;
+  }
+  a {
+    color: #fff;
+  }
+  input[type="range"] {
+    accent-color: #ff4444;
+  }
+  #rating {
+    cursor: pointer;
+    text-decoration: underline;
+  }
+  .note {
+    color: #888888;
+    font-size: 10pt;
+    line-height: 1em;
+  }
+  @media (orientation: landscape) {
     #main {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 1em;
-      text-align: center;
-      max-width: 800px;
-      margin: 0 auto;
-      background: #222222;
-      line-height: 200%;
-      border: 2px solid #442222;
-      border-radius: 4px;
-      box-shadow: 0 0 16px #442222;
+      width: 50%;
     }
-    p {
-      margin: 1em auto;
-      padding: 0 1em;
-      max-width: 700px;
-    }
-    button {
-      background: #ff4444;
-      color: #ffffff;
-      border: none;
-      padding: 0.5em 1em;
-      font-size: 1em;
-      cursor: pointer;
-    }
-    button:hover {
-      background: #ff2222;
-    }
-    button:active {
-      background: #ff0000;
-    }
-    a {
-      color: #fff;
-    }
-    input[type="range"] {
-      accent-color: #ff4444;
-    }
-    #rating {
-      cursor: pointer;
-      text-decoration: underline;
-    }
-    .note {
-      color: #888888;
-      font-size: 10pt;
-      line-height: 1em;
-    }
+  }
+  @media (orientation: portrait) {
+      #main {
+        width: 75%;
+      }
+   }
   </style>
 </head>
 <body>
