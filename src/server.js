@@ -123,7 +123,7 @@ app.post('/:generator/:item', async (req, res) => {
   if (action === 'vote') {
     let item = await getItem(itemID)
     if (!item) return res.status(404).end()
-    return res.json(await vote(item.id, ip, req.body.vote))
+    return res.json(await vote(item.id, ip, req.body.vote, category.id))
   }
   res.status(400).send('Invalid action')
 })

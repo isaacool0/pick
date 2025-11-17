@@ -18,12 +18,17 @@ let getCategory = async (name) => {
   return category;
 }
 
+
+let items = new Map();
+
 let getItems = async (category) => {
+  let cache = items.get(category);
+  if (cache && cache.expires > Date.now()) return cache.rows;
   let result = await db.query(`
     SELECT items.id, items.content,
       COUNT(CASE WHEN votes.vote THEN 1 END) AS up,
       COUNT(CASE WHEN NOT votes.vote THEN 1 END) AS down,
-      (100.0 * (COUNT(CASE WHEN votes.vote THEN 1 END) + 1)) / 
+      (100.0 * (COUNT(CASE WHEN votes.vote THEN 1 END) + 1)) /
         (COUNT(CASE WHEN votes.vote THEN 1 END) + 1 + COUNT(CASE WHEN NOT votes.vote THEN 1 END))
         AS rating
     FROM items
@@ -31,9 +36,12 @@ let getItems = async (category) => {
     WHERE items.category = $1 AND items.active = true
     GROUP BY items.id, items.content
     ORDER BY rating DESC
-  `, [category])
-  return result.rows
-}
+  `, [category]);
+  let rows = result.rows;
+  items.set(category, { rows, expires: Date.now() + 300000 }); //5 mins
+  return rows;
+};
+
 
 let getItem = async (id) => {
   let result = await db.query(`
@@ -52,6 +60,7 @@ let getItem = async (id) => {
 }
 
 let insertItem = async (category, content) => {
+  items.delete(category);
   await db.query(`
     INSERT INTO categories (name)
     VALUES ($1)
@@ -67,9 +76,10 @@ let insertItem = async (category, content) => {
   return result.rows[0]
 }
 
-let vote = async (item, ip, rating) => {
+let vote = async (item, ip, rating, category) => {
   let vote = rating === 1 ? true : false;
   let result = await db.query(`SELECT vote FROM votes WHERE item = $1 AND ip = $2`, [item, ip]);
+  if (category) items.delete(category);
   if (result.rows.length === 0) {
     await addVote(item, ip, vote);
     return 1;
