@@ -20,12 +20,11 @@ let getCategory = async (name) => {
 
 
 let items = new Map();
-
 let getItems = async (category) => {
   let cache = items.get(category);
   if (cache && cache.expires > Date.now()) return cache.rows;
   let result = await db.query(`
-    SELECT items.id, items.content,
+    SELECT items.id, items.content, items.created_at,
       COUNT(CASE WHEN votes.vote THEN 1 END) AS up,
       COUNT(CASE WHEN NOT votes.vote THEN 1 END) AS down,
       (100.0 * (COUNT(CASE WHEN votes.vote THEN 1 END) + 1)) /
@@ -34,14 +33,13 @@ let getItems = async (category) => {
     FROM items
     LEFT JOIN votes ON items.id = votes.item
     WHERE items.category = $1 AND items.active = true
-    GROUP BY items.id, items.content
-    ORDER BY rating DESC
+    GROUP BY items.id, items.content, items.created_at
+    ORDER BY rating DESC, items.created_at DESC
   `, [category]);
   let rows = result.rows;
   items.set(category, { rows, expires: Date.now() + 300000 }); //5 mins
   return rows;
 };
-
 
 let getItem = async (id) => {
   let result = await db.query(`
