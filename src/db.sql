@@ -30,6 +30,7 @@ CREATE TABLE public.items (
 
 CREATE INDEX items_id_idx ON public.items(id);
 CREATE INDEX items_category_idx ON public.items(category);
+CREATE INDEX items_category_created_at_idx ON public.items(category, created_at);
 
 CREATE TABLE public.votes (
     item TEXT NOT NULL,
@@ -42,6 +43,7 @@ CREATE TABLE public.votes (
 
 CREATE INDEX votes_item_idx ON public.votes(item);
 CREATE INDEX votes_ip_idx ON public.votes(ip);
+CREATE INDEX votes_item_vote_idx ON public.votes(item, vote);
 
 CREATE TABLE public.views (
     item TEXT NOT NULL,
