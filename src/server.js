@@ -57,12 +57,12 @@ app.get('/:generator{/:item}', async (req, res) => {
     return res.redirect(302, `/${generator}?action=new`)
   }
 
-  if (action === 'list' || action === 'items') {
+  if (action === 'list' || action === 'browse') {
     if (!category) return res.status(404).json({ error: 'Category not found' })
     let items = await getFiltered(category.id, min, max);
     if (!items.length) return res.status(200).type('text/plain').send('no items found (adjust min/max range?)');
     if (action === 'list') return res.type('text/plain').send(items.map(i => i.content).join('\n'));
-    if (action === 'items') return res.render('list', { items, category, urlParams })
+    if (action === 'browse') return res.render('list', { items, category, min, max, urlParams })
   }
 
   if (action === 'random') {
