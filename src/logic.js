@@ -58,7 +58,7 @@ let getItem = async (id) => {
 }
 
 let insertItem = async (category, content) => {
-  items.delete(category);
+  items.delete((await getCategory(category))?.id);
   await db.query(`
     INSERT INTO categories (name)
     VALUES ($1)
@@ -77,6 +77,7 @@ let insertItem = async (category, content) => {
 let vote = async (item, ip, rating, category) => {
   let vote = rating === 1 ? true : false;
   let result = await db.query(`SELECT vote FROM votes WHERE item = $1 AND ip = $2`, [item, ip]);
+  console.log(category)
   if (category) items.delete(category);
   if (result.rows.length === 0) {
     await addVote(item, ip, vote);
