@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Random Generators</title>
+  <meta name="description" content="Random generators with crowdsourced data">
+  <meta property="og:description" content="Random generators with crowdsourced data">
+  <style>
+  body {
+    background: #111111;
+    color: #ffffff;
+    margin: 0;
+    font-family: sans-serif;
+    text-align: center;
+  }
+  #main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1em;
+    text-align: center;
+    margin: 0 auto;
+    background: #222222;
+    line-height: 200%;
+    border: 2px solid #442222;
+    border-radius: 4px;
+    box-shadow: 0 0 16px #442222;
+  }
+  p {
+    margin: 1em auto;
+    padding: 0 1em;
+    max-width: 700px;
+  }
+  a {
+    color: #fff;
+  }
+  a.item {
+    color: #ff4444;
+    padding: 1px;
+  }
+  #items {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 40%;
+  }
+  .item {
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .rating {
+    flex: 0 0 auto;
+    margin-left: 1em;
+    text-align: left;
+  }
+  @media (orientation: landscape) {
+  	#main {
+  		width: 50%;
+  	}
+  }
+  @media (orientation: portrait) {
+    	#main {
+    	  width: 75%;
+    	}
+   }
+  </style>
+</head>
+<body>
+  <h1>
+    <a href="/<%= urlParams.replace(/^&/, '?') %>">Generators</a> / <a href="/<%= category.name %>"><%= category.name %></a> / <a target="_blank" href="/<%= category.name %>?action=list<%= urlParams %>">list</a></h1>
+  <div id="main">
+  <% items.forEach(item => { %>
+    <div id="items">
+    <a class="item" href="/<%= category.name %>/<%= item.id %> <%= urlParams.replace(/^&/, '?') %>" title="<%- item.content %>"><%- item.content %></a>
+    <span class='rating' onclick="toggle()" style="color:hsl(<%= item.rating * 1.2 %>,100%,50%)">
+      <%= parseFloat(Number(item.rating).toFixed(2)) %>%
+    </span>
+    </div>
+  <% }); %>
+  </div>
+</body>
+</html>
+

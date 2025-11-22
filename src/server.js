@@ -62,12 +62,7 @@ app.get('/:generator{/:item}', async (req, res) => {
     let items = await getFiltered(category.id, min, max);
     if (!items.length) return res.status(200).type('text/plain').send('no items found (adjust min/max range?)');
     if (action === 'list') return res.type('text/plain').send(items.map(i => i.content).join('\n'));
-    if (action === 'items') {
-      let links = items.map(i => {
-        return `<a href="/${category.name}/${i.id}">${i.content}</a>`;
-      }).join('<br>\n');
-      return res.type('text/html').send(`<h1><a href="/">Generators</a> / <a href="/${category.name}">${category.name}</a> / <a href="/${category.name}?action=list">list</a></h1><br>\n${links}`);
-    }
+    if (action === 'items') return res.render('list', { items, category, urlParams })
   }
 
   if (action === 'random') {
