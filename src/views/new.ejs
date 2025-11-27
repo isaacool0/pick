@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Add New Item to <%- category.name %></title>
+  <title>Add New Item to <%= category.name %></title>
   <style>
   body {
     background: #111111;
@@ -71,10 +71,10 @@
   </style>
 </head>
 <body>
-  <h1><a href="/">Generators</a> / <a href="/<%- category.name %>"><%- category.name %></a></h1>
+  <h1><a href="/">Generators</a> / <a href="/<%= category.name %>"><%= category.name %></a></h1>
   <div id="main">
   <p>new item</p>
-  <form method="POST" action="/<%- category.name %>?action=create">
+  <form method="POST" action="/<%= category.name %>?action=create">
     <textarea name="content" placeholder="enter content..." required></textarea><br>
     <button type="submit">Submit</button>
   </form>

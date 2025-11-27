@@ -120,7 +120,7 @@
     <div id="items">
     <% items.forEach(item => { %>
       <div class="row">
-        <a class="item" href="/<%= category.name %>/<%= item.id %> <%= urlParams.replace(/^&/, '?') %>" title="<%- item.content %>"><%- item.content %></a>
+        <a class="item" href="/<%= category.name %>/<%= item.id %> <%= urlParams.replace(/^&/, '?') %>" title="<%= item.content %>"><%= item.content %></a>
         <span class='rating' style="color:hsl(<%= item.rating * 1.2 %>,100%,50%)">
           <%= parseFloat(Number(item.rating).toFixed(2)) %>%
         </span>
