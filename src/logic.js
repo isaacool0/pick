@@ -145,7 +145,9 @@ let randomItem = async (category, ip, min, max) => {
 }
 
 let percent = async (n, def) => {
-  return Math.min(100, Math.max(0, parseFloat(n) ?? def));
+  let num = parseFloat(n);
+  if (isNaN(num)) num = def;
+  return Math.min(100, Math.max(0, num));
 }
 
 let getParams = async (query) => {
